@@ -80,8 +80,10 @@ DATABASES = {
     }
 }
 
-# Add SSL only for Supabase (not localhost)
-if os.getenv("DB_HOST", "localhost") != "localhost":
+# Add SSL for external database hosts (Supabase, etc.)
+# Skip SSL for localhost and Render internal hosts (dpg-*)
+_db_host = os.getenv("DB_HOST", "localhost")
+if _db_host != "localhost" and not _db_host.startswith("dpg-"):
     DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 
 AUTH_USER_MODEL = "users.CustomUser"
