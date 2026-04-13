@@ -196,26 +196,26 @@ const LandingPage = () => {
         <div className="relative z-10 text-center max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-400/20 bg-cyan-400/5 text-cyan-400 text-xs font-medium mb-8 backdrop-blur-sm">
             <Star className="w-3 h-3" />
-            Trained on 70,692 CDC Health Survey Records
+            7+ Disease Screenings · Lab Reports · Medicine Analysis · AI Assistant
           </div>
 
           <h1 className="text-5xl md:text-7xl font-black text-white leading-tight mb-6"
             style={{ textShadow: '0 0 80px rgba(0,212,255,0.2)' }}>
-            Clinical AI for
+            Your One-Stop
             <br />
             <span style={{
               background: 'linear-gradient(135deg, #00d4ff, #00ff88)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>
-              Diabetes Risk
+              Clinical AI Platform
             </span>
           </h1>
 
           <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            A stacking ensemble of Random Forest, XGBoost, LightGBM and Gradient Boosting
-            that predicts diabetes risk with <strong className="text-white">83% accuracy</strong> and <strong className="text-white">88% recall</strong>.
-            Built for doctors. Powered by real data.
+            Screen for <strong className="text-white">7+ diseases</strong>, analyze lab reports, check drug interactions,
+            and get AI-powered health insights — all in one platform.
+            Built for doctors. Powered by <strong className="text-white">ML + Gemini AI</strong>.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -237,7 +237,7 @@ const LandingPage = () => {
 
           {/* Floating badges */}
           <div className="flex flex-wrap justify-center gap-3 mt-12">
-            {['ROC-AUC: 0.83', 'F1: 0.78', 'SMOTETomek', 'SHAP Values', 'JWT Secured'].map(badge => (
+            {['Multi-Disease AI', 'Lab Report OCR', 'Drug Interactions', 'Symptom NLP', 'ML Ensemble', 'JWT Secured'].map(badge => (
               <span key={badge} className="px-3 py-1.5 rounded-full text-xs font-mono text-cyan-400 border border-cyan-400/20 bg-cyan-400/5">
                 {badge}
               </span>
@@ -282,7 +282,7 @@ const LandingPage = () => {
           <div className="text-center mb-16">
             <p className="text-cyan-400 text-xs font-mono uppercase tracking-widest mb-3">Clinical Workflow</p>
             <h2 className="text-3xl md:text-4xl font-black text-white mb-4">How MediScan Works</h2>
-            <p className="text-slate-400 max-w-xl mx-auto">Three steps from patient registration to AI-powered risk assessment</p>
+            <p className="text-slate-400 max-w-xl mx-auto">A complete clinical intelligence workflow — from screening to action</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
@@ -291,9 +291,9 @@ const LandingPage = () => {
               style={{ background: 'linear-gradient(90deg, #00d4ff, #9d4edd)' }} />
 
             {[
-              { num: '01', title: 'Register Patient', desc: 'Add patient demographics, medical history, blood group and contact details to the system.', color: '#00d4ff' },
-              { num: '02', title: 'Enter Health Data', desc: 'Submit 21 CDC health indicators including BMI, blood pressure, lifestyle factors and age category.', color: '#00ff88' },
-              { num: '03', title: 'Get AI Prediction', desc: 'Receive instant diabetes risk score, SHAP factor breakdown, ensemble analysis and clinical recommendations.', color: '#9d4edd' },
+              { num: '01', title: 'Screen & Assess', desc: 'Run AI-powered screenings for diabetes, heart disease, stroke, kidney, liver, lung, and thyroid conditions.', color: '#00d4ff' },
+              { num: '02', title: 'Analyze Reports & Meds', desc: 'Upload lab reports for AI extraction, check drug interactions, and get clinical interpretation with reference ranges.', color: '#00ff88' },
+              { num: '03', title: 'Get AI Insights', desc: 'Receive risk scores, symptom analysis, AI health chat, and clinical note summaries — all in one dashboard.', color: '#9d4edd' },
             ].map((step, i) => (
               <div key={i} className="relative p-6 rounded-2xl border border-slate-800 hover:border-slate-600 transition-all group"
                 style={{ background: 'rgba(6,20,40,0.8)', backdropFilter: 'blur(20px)' }}>
@@ -398,16 +398,16 @@ const LandingPage = () => {
         <GlowOrb color="#00d4ff" size={600} x="50%" y="50%" blur={150} />
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
-            Start Assessing
+            Your Complete
             <br />
             <span style={{
               background: 'linear-gradient(135deg, #00d4ff, #00ff88)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-            }}>Patient Risk Today</span>
+            }}>Health AI Platform</span>
           </h2>
           <p className="text-slate-400 text-lg mb-10">
-            Join doctors already using MediScan AI to make faster, more accurate clinical decisions.
+            Screen diseases, analyze reports, check medications, and chat with AI — all in one place. Start today.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button onClick={() => navigate('/login')}
@@ -437,7 +437,7 @@ const LandingPage = () => {
           <span className="text-white font-bold">MediScan AI</span>
         </div>
         <p className="text-slate-600 text-xs font-mono mb-4">
-          Built with Django · PostgreSQL · React · scikit-learn · XGBoost · LightGBM
+          Built with Django · React · Gemini AI · OpenFDA · scikit-learn · XGBoost · LightGBM
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
           <span className="text-slate-500">Built by</span>
