@@ -38,7 +38,7 @@ class RegisterView(generics.CreateAPIView):
             admin_code = data.get('admin_code', '')
             if admin_code != ADMIN_SECRET_CODE:
                 return Response(
-                    {'admin_code': ['Invalid admin access code. Contact hospital IT administration.']},
+                    {'admin_code': ['Invalid admin access code. Contact dev22ashish@gmail.com for admin access.']},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             # Admins have no department

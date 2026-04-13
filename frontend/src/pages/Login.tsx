@@ -47,7 +47,7 @@ const Login = () => {
       if (status === 401 || status === 400) {
         setLoginError('Incorrect username or password. Please try again.');
       } else if (status === 403) {
-        setLoginError('Your account has been deactivated. Contact admin.');
+        setLoginError('Your account has been deactivated. Contact dev22ashish@gmail.com');
       } else {
         setLoginError('Something went wrong. Please try again.');
       }
@@ -291,7 +291,7 @@ const Login = () => {
                   className="w-full bg-transparent border-b border-red-400/30 text-foreground py-2 focus:border-red-400 outline-none text-sm font-mono placeholder:text-slate-600"
                   placeholder="Enter secret admin code" />
                 <FieldError field="admin_code" />
-                <p className="text-xs text-slate-600 mt-2">Contact hospital IT administration for access code</p>
+                <p className="text-xs text-slate-600 mt-2">Contact dev22ashish@gmail.com for admin access code</p>
               </div>
             )}
             <div>
