@@ -332,13 +332,11 @@ mediscan-ai/
 
 ---
 
-## 👨‍💻 Authors
+## 👨‍💻 Author
 
 **Devashish**
-[![GitHub](https://img.shields.io/badge/GitHub-DMZ22-black?style=flat-square&logo=github)](https://github.com/DMZ22)
 
-**Daksh Trivedi**
-[![GitHub](https://img.shields.io/badge/GitHub-Daksh910-black?style=flat-square&logo=github)](https://github.com/Daksh910)
+[![GitHub](https://img.shields.io/badge/GitHub-DMZ22-black?style=flat-square&logo=github)](https://github.com/DMZ22)
 
 ---
 
