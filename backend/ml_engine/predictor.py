@@ -76,7 +76,11 @@ def load_model():
 def get_pipeline():
     global _pipeline
     if _pipeline is None:
-        load_model()
+        try:
+            load_model()
+        except Exception as e:
+            logger.error(f"Failed to load ML model: {e}")
+            return None
     return _pipeline
 
 
@@ -174,6 +178,12 @@ def get_model_breakdown(pipeline: dict, arr_pp) -> dict:
 
 def predict_risk(data: Dict[str, Any]) -> Dict[str, Any]:
     pipeline = get_pipeline()
+    if pipeline is None:
+        return {
+            "risk_score": 0, "risk_level": "low", "risk_factors": [],
+            "confidence": 0, "recommendations": "ML model not available. Please use AI screening instead.",
+            "shap_values": {}, "model_breakdown": {}, "features_used": {},
+        }
     preprocessor = pipeline["preprocessor"]
     model = pipeline["model"]
     threshold = pipeline.get("optimal_threshold", 0.5)
