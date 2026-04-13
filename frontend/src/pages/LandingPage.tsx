@@ -2,59 +2,60 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import {
   Shield, Brain, Activity, Users, ChevronRight,
-  Database, Zap, BarChart3, Lock, ArrowRight, Star
+  Database, Zap, BarChart3, Lock, ArrowRight, Star,
+  Stethoscope, FileText, Pill, Bot, Heart
 } from 'lucide-react';
 
 const STATS = [
-  { value: '83%', label: 'Model Accuracy', sub: 'ROC-AUC: 0.83' },
+  { value: '7+', label: 'Disease Screenings', sub: 'AI-Powered Analysis' },
   { value: '70K+', label: 'Training Records', sub: 'CDC Health Survey' },
-  { value: '4', label: 'ML Algorithms', sub: 'Stacking Ensemble' },
+  { value: '6', label: 'Lab Panels', sub: 'Reference Ranges' },
   { value: '88%', label: 'Recall Rate', sub: 'Clinical Sensitivity' },
 ];
 
 const FEATURES = [
   {
-    icon: Brain,
-    title: 'Ensemble ML Engine',
-    desc: 'Stacking ensemble of Random Forest, XGBoost, LightGBM & Gradient Boosting with SMOTETomek resampling for superior class balance.',
+    icon: Stethoscope,
+    title: 'Multi-Disease Screening',
+    desc: 'AI-powered risk assessment for 7+ diseases: diabetes, heart disease, stroke, kidney, liver, lung, and thyroid disorders.',
     color: '#00d4ff',
   },
   {
-    icon: Activity,
-    title: 'Real-Time Risk Assessment',
-    desc: 'Submit 21 CDC health indicators and receive instant diabetes risk probability with confidence scores and clinical recommendations.',
+    icon: Brain,
+    title: 'Ensemble ML Engine',
+    desc: 'Diabetes prediction with stacking ensemble of Random Forest, XGBoost, LightGBM & Gradient Boosting on 70K+ CDC records.',
     color: '#00ff88',
   },
   {
-    icon: BarChart3,
-    title: 'SHAP Explainability',
-    desc: 'Understand exactly which health factors drive each prediction with perturbation-based feature importance scores.',
+    icon: FileText,
+    title: 'Lab Report Analyzer',
+    desc: 'Upload lab reports or manually enter values. AI extracts, flags abnormalities, and provides clinical interpretation.',
     color: '#ffb800',
   },
   {
-    icon: Database,
-    title: 'PostgreSQL Backend',
-    desc: 'Full patient history, assessment timelines, and analytics powered by Django REST Framework with JWT authentication.',
+    icon: Pill,
+    title: 'Medicine Analyzer',
+    desc: 'Drug search with OpenFDA, side effects, contraindications, and AI-powered drug interaction checker for up to 10 medications.',
     color: '#ff4757',
+  },
+  {
+    icon: Bot,
+    title: 'AI Health Assistant',
+    desc: 'NLP-powered symptom checker, conversational health chatbot, and clinical note summarization with structured output.',
+    color: '#9d4edd',
   },
   {
     icon: Shield,
     title: 'Clinical Grade Security',
-    desc: 'Role-based access control for doctors, nurses, and admins. Every assessment is logged with assessor attribution.',
-    color: '#9d4edd',
-  },
-  {
-    icon: Zap,
-    title: 'Analytics Dashboard',
-    desc: 'Risk distribution trends, age group analysis, monthly cohort charts and real-time activity feed.',
+    desc: 'JWT auth, role-based access, admin panel with audit logs. Every action is tracked with assessor attribution.',
     color: '#00d4ff',
   },
 ];
 
 const TECH = [
-  'Django REST Framework', 'PostgreSQL', 'Random Forest', 'XGBoost',
-  'LightGBM', 'Gradient Boosting', 'SMOTETomek', 'SHAP Values',
-  'JWT Auth', 'React 18', 'TypeScript', 'Recharts',
+  'Django REST Framework', 'PostgreSQL', 'Google Gemini AI', 'OpenFDA API',
+  'Random Forest', 'XGBoost', 'LightGBM', 'Gradient Boosting',
+  'NLP / Symptom Analysis', 'React 18', 'TypeScript', 'Recharts',
 ];
 
 // Animated counter hook

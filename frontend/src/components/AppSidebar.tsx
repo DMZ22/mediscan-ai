@@ -1,12 +1,16 @@
 import { NavLink as RouterNavLink, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, FilePlus, LogOut, Activity, Upload, User, Shield } from 'lucide-react';
+import { LayoutDashboard, Users, FilePlus, LogOut, Activity, Upload, User, Shield, Stethoscope, FileText, Pill, Bot } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 const getNavItems = (role: string) => {
   const base = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/patients', label: 'Patients', icon: Users },
-    { path: '/assessment', label: 'New Assessment', icon: FilePlus },
+    { path: '/assessment', label: 'Diabetes Assessment', icon: FilePlus },
+    { path: '/screening', label: 'Health Screening', icon: Stethoscope },
+    { path: '/reports', label: 'Lab Reports', icon: FileText },
+    { path: '/medicines', label: 'Medicines', icon: Pill },
+    { path: '/ai-assistant', label: 'AI Assistant', icon: Bot },
     { path: '/bulk-import', label: 'Bulk Import', icon: Upload },
     { path: '/profile', label: 'My Profile', icon: User },
   ];

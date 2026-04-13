@@ -18,9 +18,9 @@
 
 ## 📌 Overview
 
-MediScan AI is a full-stack clinical decision support system that predicts diabetes risk using an ensemble of machine learning models. Built for doctors and hospital administrators, it provides real-time risk assessment, patient management, and clinical analytics.
+MediScan AI is a **one-stop clinical intelligence platform** that combines multi-disease risk screening, lab report analysis, medicine interaction checking, and an AI health assistant. Built for doctors and hospital administrators with production-grade security.
 
-Trained on **70,692 records** from the CDC Diabetes Health Indicators dataset with a stacking ensemble achieving **ROC-AUC of 0.83** and **88% recall**.
+**Core capabilities:** 7+ disease screenings, lab report analyzer (upload + manual), drug interaction checker, NLP symptom analysis, AI health chatbot, and a diabetes ML ensemble trained on **70,692 CDC records** (ROC-AUC: 0.83, 88% recall).
 
 ---
 
@@ -54,6 +54,29 @@ Trained on **70,692 records** from the CDC Diabetes Health Indicators dataset wi
 - Age group stacked bar chart
 - Real-time activity feed
 - High-risk patient alerts
+
+### 🩺 Multi-Disease Health Screening (NEW)
+- AI-powered risk screening for 7 diseases: Diabetes, Heart Disease, Stroke, Kidney Disease, Liver Disease, Lung Disease, Thyroid
+- Disease-specific health indicator forms
+- Diabetes uses local ML ensemble; others use Google Gemini AI
+- Risk score, factors, recommendations, and detailed AI analysis
+
+### 🧪 Lab Report Analyzer (NEW)
+- Manual entry with 6 lab panels: CBC, Lipid, Metabolic, Liver, Kidney, Thyroid
+- Upload PDF/image reports — AI extracts values automatically (Gemini Vision)
+- Rule-based flagging with medical reference ranges
+- AI-powered clinical interpretation and recommendations
+
+### 💊 Medicine Analyzer (NEW)
+- Drug search powered by OpenFDA API (free, no key needed)
+- Detailed drug info: uses, dosage, side effects, contraindications
+- Drug interaction checker for up to 10 medications
+- AI-enhanced explanations via Gemini
+
+### 🤖 AI Health Assistant (NEW)
+- **Symptom Checker**: Describe symptoms in natural language → AI suggests conditions, urgency, and next steps
+- **Health Chat**: Conversational AI assistant for general health questions
+- **Note Summarizer**: Paste clinical notes → structured summary with diagnoses, medications, and follow-up
 
 ### 🛡️ Admin Panel
 - Separate admin dashboard (no sidebar)
@@ -201,6 +224,7 @@ FRONTEND_URL=http://localhost:5173
 BREVO_API_KEY=your-brevo-api-key
 SENDER_EMAIL=noreply@yourdomain.com
 DEFAULT_FROM_EMAIL=MediScan AI <noreply@yourdomain.com>
+GEMINI_API_KEY=your-gemini-api-key
 ```
 
 ### Frontend (.env.local)
@@ -244,6 +268,26 @@ DELETE /api/admin-panel/doctors/{id}/delete/  Delete doctor
 GET    /api/admin-panel/patients/          Patient list
 DELETE /api/admin-panel/patients/{id}/delete/ Delete patient
 GET    /api/admin-panel/export/            Export CSV
+
+GET    /api/screening/diseases/             List available diseases
+POST   /api/screening/create/              Run disease screening
+GET    /api/screening/                     List screenings
+GET    /api/screening/patient/{id}/        Patient screenings
+
+GET    /api/reports/panels/                List lab panels
+POST   /api/reports/analyze/               Analyze manual lab values
+POST   /api/reports/upload/                Upload & analyze report
+GET    /api/reports/                       List reports
+GET    /api/reports/patient/{id}/          Patient reports
+
+GET    /api/medicines/search/?q=name       Search drugs (OpenFDA)
+GET    /api/medicines/{drug_name}/         Drug details + AI
+POST   /api/medicines/interactions/        Check drug interactions
+GET    /api/medicines/history/             Query history
+
+POST   /api/ai/symptoms/                   Symptom analysis (NLP)
+POST   /api/ai/chat/                       Health chatbot
+POST   /api/ai/summarize-notes/            Clinical note summary
 
 GET    /api/docs/                          Swagger UI
 ```

@@ -29,6 +29,10 @@ INSTALLED_APPS = [
     "patients",
     "ml_engine",
     "analytics",
+    "ai_engine",
+    "screening",
+    "reports",
+    "medicines",
 ]
 
 MIDDLEWARE = [
@@ -161,6 +165,9 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "")
 EMAIL_TIMEOUT = 10
+
+# ── GEMINI AI ────────────────────────────────────────────────────────
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 # ── PRODUCTION SECURITY ──────────────────────────────────────────────
 if not DEBUG:

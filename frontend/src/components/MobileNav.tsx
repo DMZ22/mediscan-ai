@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, LayoutDashboard, Users, FilePlus, BarChart3, LogOut, Activity } from 'lucide-react';
+import { Menu, X, LayoutDashboard, Users, FilePlus, LogOut, Activity, Stethoscope, FileText, Pill, Bot } from 'lucide-react';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/patients', label: 'Patients', icon: Users },
-  { path: '/assessment', label: 'New Assessment', icon: FilePlus },
-  { path: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { path: '/assessment', label: 'Diabetes Assessment', icon: FilePlus },
+  { path: '/screening', label: 'Health Screening', icon: Stethoscope },
+  { path: '/reports', label: 'Lab Reports', icon: FileText },
+  { path: '/medicines', label: 'Medicines', icon: Pill },
+  { path: '/ai-assistant', label: 'AI Assistant', icon: Bot },
 ];
 
 export const MobileNav = () => {

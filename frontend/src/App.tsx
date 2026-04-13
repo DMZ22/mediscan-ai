@@ -14,6 +14,10 @@ import AdminPanel from "./pages/AdminPanel";
 import BulkImport from "./pages/BulkImport";
 import ProfilePage from "./pages/ProfilePage";
 import ResetPassword from "./pages/ResetPassword";
+import Screening from "./pages/Screening";
+import Reports from "./pages/Reports";
+import Medicines from "./pages/Medicines";
+import HealthAssistant from "./pages/HealthAssistant";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +46,10 @@ const App = () => (
             <Route path="/patients/:id" element={<PatientDetail />} />
             <Route path="/assessment" element={<Assessment />} />
             <Route path="/bulk-import" element={<BulkImport />} />
+            <Route path="/screening" element={<Screening />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/medicines" element={<Medicines />} />
+            <Route path="/ai-assistant" element={<HealthAssistant />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="*" element={<NotFound />} />
