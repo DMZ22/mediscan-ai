@@ -60,9 +60,8 @@ GENHLTH_LABELS = {1: "Excellent", 2: "Very Good", 3: "Good", 4: "Fair", 5: "Poor
 def load_model():
     global _pipeline, _metrics
     if not MODEL_PATH.exists():
-        raise FileNotFoundError(
-            f"Model not found at {MODEL_PATH}. Run: python ml_engine/train.py"
-        )
+        logger.warning(f"ML model not found at {MODEL_PATH}. Diabetes predictions will be unavailable.")
+        return None
     with open(MODEL_PATH, "rb") as f:
         _pipeline = pickle.load(f)
     if METRICS_PATH.exists():
