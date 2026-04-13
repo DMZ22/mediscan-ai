@@ -47,7 +47,7 @@ class Command(BaseCommand):
         admin, created = CustomUser.objects.get_or_create(
             username="admin",
             defaults={
-                "email": "admin@mediscan.ai",
+                "email": "dev22ashish@gmail.com",
                 "first_name": "Admin", "last_name": "User",
                 "role": "admin", "department": "Administration",
                 "is_staff": True, "is_superuser": True,
