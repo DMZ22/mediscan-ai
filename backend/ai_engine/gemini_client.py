@@ -204,8 +204,10 @@ Respond ONLY with valid JSON in the exact format specified."""
 
 
 def screen_disease(disease_type: str, indicators: dict) -> dict:
-    """Run AI-powered disease risk screening."""
-    prompt = f"""Analyze these health indicators for {disease_type} risk assessment.
+    """Run AI-powered disease risk screening with fallback."""
+    from .fallbacks import fallback_screen_disease
+    try:
+        prompt = f"""Analyze these health indicators for {disease_type} risk assessment.
 
 Patient indicators: {json.dumps(indicators)}
 
@@ -224,7 +226,12 @@ Respond with ONLY this JSON format:
 Risk level guide: 0-25=low, 25-50=medium, 50-75=high, 75-100=critical.
 Provide 3-6 risk factors sorted by severity. Be clinically accurate."""
 
-    return ask_gemini_json(prompt, SCREENING_SYSTEM)
+        result = ask_gemini_json(prompt, SCREENING_SYSTEM)
+        if not result.get("parse_error"):
+            return result
+    except Exception as e:
+        logger.warning(f"Gemini screening failed, using fallback: {e}")
+    return fallback_screen_disease(disease_type, indicators)
 
 
 # ── Lab Report Prompts ───────────────────────────────────────────────
@@ -235,8 +242,10 @@ Respond ONLY with valid JSON in the exact format specified."""
 
 
 def analyze_lab_values(panel_type: str, values: dict) -> dict:
-    """Analyze manually entered lab values."""
-    prompt = f"""Analyze these {panel_type} lab results:
+    """Analyze lab values with fallback."""
+    from .fallbacks import fallback_analyze_lab
+    try:
+        prompt = f"""Analyze these {panel_type} lab results:
 
 {json.dumps(values, indent=2)}
 
@@ -251,7 +260,12 @@ Respond with ONLY this JSON:
     "disclaimer": "AI-generated interpretation. Must be reviewed by a healthcare professional."
 }}"""
 
-    return ask_gemini_json(prompt, LAB_SYSTEM)
+        result = ask_gemini_json(prompt, LAB_SYSTEM)
+        if not result.get("parse_error"):
+            return result
+    except Exception as e:
+        logger.warning(f"Gemini lab analysis failed, using fallback: {e}")
+    return fallback_analyze_lab(panel_type, values)
 
 
 def extract_lab_from_image(image_data: bytes, mime_type: str = "image/jpeg") -> dict:
@@ -294,9 +308,11 @@ Respond ONLY with valid JSON."""
 
 
 def analyze_drug(drug_name: str, fda_data: dict = None) -> dict:
-    """Get detailed drug information using Gemini."""
-    context = f"\nFDA data available: {json.dumps(fda_data)}" if fda_data else ""
-    prompt = f"""Provide comprehensive information about the drug: {drug_name}{context}
+    """Get detailed drug information with fallback."""
+    from .fallbacks import fallback_analyze_drug
+    try:
+        context = f"\nFDA data available: {json.dumps(fda_data)}" if fda_data else ""
+        prompt = f"""Provide comprehensive information about the drug: {drug_name}{context}
 
 Respond with ONLY this JSON:
 {{
@@ -315,12 +331,19 @@ Respond with ONLY this JSON:
     "disclaimer": "Consult your doctor or pharmacist for personalized medical advice."
 }}"""
 
-    return ask_gemini_json(prompt, MEDICINE_SYSTEM)
+        result = ask_gemini_json(prompt, MEDICINE_SYSTEM)
+        if not result.get("parse_error"):
+            return result
+    except Exception as e:
+        logger.warning(f"Gemini drug analysis failed, using fallback: {e}")
+    return fallback_analyze_drug(drug_name)
 
 
 def check_interactions(drug_list: list) -> dict:
-    """Check drug-drug interactions."""
-    prompt = f"""Analyze potential drug interactions between these medications:
+    """Check drug interactions with fallback."""
+    from .fallbacks import fallback_check_interactions
+    try:
+        prompt = f"""Analyze potential drug interactions between these medications:
 {json.dumps(drug_list)}
 
 Respond with ONLY this JSON:
@@ -339,7 +362,12 @@ Respond with ONLY this JSON:
     "disclaimer": "This is an AI screening tool. Always consult a pharmacist or physician about drug interactions."
 }}"""
 
-    return ask_gemini_json(prompt, MEDICINE_SYSTEM)
+        result = ask_gemini_json(prompt, MEDICINE_SYSTEM)
+        if not result.get("parse_error"):
+            return result
+    except Exception as e:
+        logger.warning(f"Gemini interaction check failed, using fallback: {e}")
+    return fallback_check_interactions(drug_list)
 
 
 # ── NLP / Health Assistant Prompts ───────────────────────────────────
@@ -357,9 +385,11 @@ If asked about emergencies, always advise calling emergency services immediately
 
 
 def analyze_symptoms(symptoms_text: str, patient_info: dict = None) -> dict:
-    """Analyze free-text symptoms and suggest possible conditions."""
-    context = f"\nPatient context: {json.dumps(patient_info)}" if patient_info else ""
-    prompt = f"""Analyze these symptoms: "{symptoms_text}"{context}
+    """Analyze symptoms with fallback."""
+    from .fallbacks import fallback_analyze_symptoms
+    try:
+        context = f"\nPatient context: {json.dumps(patient_info)}" if patient_info else ""
+        prompt = f"""Analyze these symptoms: "{symptoms_text}"{context}
 
 Respond with ONLY this JSON:
 {{
@@ -382,31 +412,43 @@ Respond with ONLY this JSON:
 
 List 2-5 possible conditions sorted by likelihood. Be conservative with severity ratings."""
 
-    return ask_gemini_json(prompt, SYMPTOM_SYSTEM)
+        result = ask_gemini_json(prompt, SYMPTOM_SYSTEM)
+        if not result.get("parse_error"):
+            return result
+    except Exception as e:
+        logger.warning(f"Gemini symptom analysis failed, using fallback: {e}")
+    return fallback_analyze_symptoms(symptoms_text)
 
 
 def health_chat(message: str, history: list = None) -> str:
-    """Conversational health assistant."""
-    chat_context = ""
-    if history:
-        chat_context = "\n\nConversation history:\n"
-        for msg in history[-10:]:
-            role = msg.get("role", "user")
-            chat_context += f"{role}: {msg.get('content', '')}\n"
+    """Conversational health assistant with fallback."""
+    from .fallbacks import fallback_health_chat
+    try:
+        chat_context = ""
+        if history:
+            chat_context = "\n\nConversation history:\n"
+            for msg in history[-10:]:
+                role = msg.get("role", "user")
+                chat_context += f"{role}: {msg.get('content', '')}\n"
 
-    prompt = f"""{chat_context}
+        prompt = f"""{chat_context}
 User message: {message}
 
 Respond helpfully and empathetically. If the user describes symptoms, suggest they see a doctor.
 If it's a medical emergency, advise calling emergency services.
 Keep your response under 200 words. Do not use markdown formatting."""
 
-    return ask_gemini(prompt, CHAT_SYSTEM)
+        return ask_gemini(prompt, CHAT_SYSTEM)
+    except Exception as e:
+        logger.warning(f"Gemini chat failed, using fallback: {e}")
+        return fallback_health_chat(message)
 
 
 def summarize_clinical_notes(notes_text: str) -> dict:
-    """Summarize clinical/doctor notes into structured format."""
-    prompt = f"""Summarize these clinical notes into a structured format:
+    """Summarize clinical notes with fallback."""
+    from .fallbacks import fallback_summarize_notes
+    try:
+        prompt = f"""Summarize these clinical notes into a structured format:
 
 "{notes_text}"
 
@@ -421,5 +463,10 @@ Respond with ONLY this JSON:
     "concerns": ["<flagged concerns>"]
 }}"""
 
-    return ask_gemini_json(prompt, """You are a clinical documentation specialist.
+        result = ask_gemini_json(prompt, """You are a clinical documentation specialist.
 Extract and organize key information from clinical notes. Respond ONLY with valid JSON.""")
+        if not result.get("parse_error"):
+            return result
+    except Exception as e:
+        logger.warning(f"Gemini note summary failed, using fallback: {e}")
+    return fallback_summarize_notes(notes_text)
