@@ -1,16 +1,15 @@
 <div align="center">
 
 # 🏥 MediScan AI
-### Clinical Intelligence Platform for Diabetes Risk Assessment
+### One-Stop Clinical AI Platform
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue?style=flat-square&logo=python)](https://python.org)
 [![Django](https://img.shields.io/badge/Django-4.2-green?style=flat-square&logo=django)](https://djangoproject.com)
 [![React](https://img.shields.io/badge/React-18-cyan?style=flat-square&logo=react)](https://reactjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://typescriptlang.org)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-green?style=flat-square&logo=supabase)](https://supabase.com)
+[![Gemini AI](https://img.shields.io/badge/Gemini_AI-powered-orange?style=flat-square&logo=google)](https://ai.google.dev)
 
-**Live Demo:** [mediscan-ai-beta.vercel.app](https://mediscan-ai-beta.vercel.app)  
-**API Docs:** [mediscan-backend-fspg.onrender.com/api/docs](https://mediscan-backend-fspg.onrender.com/api/docs)
+**Live Demo:** [frontend-lake-three-20.vercel.app](https://frontend-lake-three-20.vercel.app)
 
 </div>
 
