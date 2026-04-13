@@ -5,7 +5,7 @@ import { GlassCard } from '@/components/GlassCard';
 import { CountUp } from '@/components/CountUp';
 import { RiskBadge } from '@/components/RiskBadge';
 import { CardSkeleton, ChartSkeleton, TableSkeleton } from '@/components/LoadingSkeleton';
-import { Users, Activity, AlertTriangle, Brain } from 'lucide-react';
+import { Users, Activity, AlertTriangle, Brain, Stethoscope, FileText, Pill } from 'lucide-react';
 import {
   PieChart, Pie, Cell, Tooltip, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, AreaChart, Area, ResponsiveContainer
@@ -37,7 +37,10 @@ const statIcons = [
   { icon: Users, color: 'text-cyan-400' },
   { icon: Activity, color: 'text-green-400' },
   { icon: AlertTriangle, color: 'text-red-400' },
-  { icon: Brain, color: 'text-purple-400' },
+  { icon: Stethoscope, color: 'text-purple-400' },
+  { icon: FileText, color: 'text-amber-400' },
+  { icon: Pill, color: 'text-blue-400' },
+  { icon: Brain, color: 'text-pink-400' },
 ];
 
 const Dashboard = () => {
@@ -72,6 +75,9 @@ const Dashboard = () => {
           total_patients: totals.patients ?? 0,
           today_assessments: totals.today_assessments ?? 0,
           high_risk: totals.high_risk_patients ?? 0,
+          screenings: totals.screenings ?? 0,
+          lab_reports: totals.lab_reports ?? 0,
+          medicine_queries: totals.medicine_queries ?? 0,
           avg_risk: averages.risk_score ?? 0,
         });
 
@@ -116,7 +122,7 @@ const Dashboard = () => {
       } catch (err) {
         toast.error('Failed to load dashboard data. Showing demo data.');
         // Fallback demo data
-        setSummary({ total_patients: 12, today_assessments: 3, high_risk: 4, avg_risk: 52.3 });
+        setSummary({ total_patients: 12, today_assessments: 3, high_risk: 4, screenings: 8, lab_reports: 5, medicine_queries: 3, avg_risk: 52.3 });
         setRiskDist([
           { name: 'Low', value: 3 }, { name: 'Medium', value: 4 },
           { name: 'High', value: 3 }, { name: 'Critical', value: 2 },
@@ -154,6 +160,9 @@ const Dashboard = () => {
     { label: 'Total Patients', value: summary.total_patients, suffix: '' },
     { label: "Today's Assessments", value: summary.today_assessments, suffix: '' },
     { label: 'High Risk Patients', value: summary.high_risk, suffix: '' },
+    { label: 'Screenings Done', value: summary.screenings ?? 0, suffix: '' },
+    { label: 'Lab Reports', value: summary.lab_reports ?? 0, suffix: '' },
+    { label: 'Medicine Queries', value: summary.medicine_queries ?? 0, suffix: '' },
     { label: 'Avg Risk Score', value: summary.avg_risk, suffix: '%', decimals: 1 },
   ] : [];
 
@@ -177,11 +186,11 @@ const Dashboard = () => {
 
         {/* Stats */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={i} />)}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 7 }).map((_, i) => <CardSkeleton key={i} />)}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {statCards.map((card, i) => {
               const { icon: Icon, color } = statIcons[i];
               return (

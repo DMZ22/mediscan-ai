@@ -6,6 +6,9 @@ from django.db.models.functions import TruncDate, TruncMonth
 from django.utils import timezone
 from datetime import timedelta
 from patients.models import Patient, Assessment
+from screening.models import Screening
+from reports.models import LabReport
+from medicines.models import MedicineQuery
 from ml_engine.predictor import get_model_info
 
 
@@ -45,6 +48,18 @@ class DashboardSummaryView(APIView):
             .annotate(count=Count("id"))
         )
 
+        # New feature stats
+        total_screenings = Screening.objects.count()
+        total_reports = LabReport.objects.count()
+        total_medicine_queries = MedicineQuery.objects.count()
+
+        # Screening disease distribution
+        disease_dist = list(
+            Screening.objects.values("disease_type")
+            .annotate(count=Count("id"))
+            .order_by("-count")
+        )
+
         return Response({
             "totals": {
                 "patients": total_patients,
@@ -52,8 +67,12 @@ class DashboardSummaryView(APIView):
                 "high_risk_patients": high_risk_count,
                 "today_assessments": today_assessments,
                 "today_new_patients": today_patients,
+                "screenings": total_screenings,
+                "lab_reports": total_reports,
+                "medicine_queries": total_medicine_queries,
             },
             "risk_distribution": list(risk_dist),
+            "disease_distribution": disease_dist,
             "averages": {
                 "bmi": round(avg_stats["avg_bmi"] or 0, 1),
                 "risk_score": round((avg_stats["avg_risk_score"] or 0) * 100, 1),
