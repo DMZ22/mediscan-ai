@@ -332,16 +332,16 @@ mediscan-ai/
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Authors
+
+**Devashish**
+[![GitHub](https://img.shields.io/badge/GitHub-DMZ22-black?style=flat-square&logo=github)](https://github.com/DMZ22)
 
 **Daksh Trivedi**
-
-[![Email](https://img.shields.io/badge/Email-dakshtrivedi2@gmail.com-red?style=flat-square&logo=gmail)](mailto:dakshtrivedi2@gmail.com)
 [![GitHub](https://img.shields.io/badge/GitHub-Daksh910-black?style=flat-square&logo=github)](https://github.com/Daksh910)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-daksh--trivedi-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/daksh-trivedi-68bab8259)
 
 ---
 
 <div align="center">
-<sub>Built with ❤️ using Django, React, and scikit-learn</sub>
+<sub>Built with Django, React, Gemini AI, and scikit-learn</sub>
 </div>
