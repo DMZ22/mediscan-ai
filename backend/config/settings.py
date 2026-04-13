@@ -68,23 +68,28 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 # ── DATABASE ──────────────────────────────────────────────────────────
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "mediscan_db"),
-        "USER": os.getenv("DB_USER", "postgres"),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
-        "CONN_MAX_AGE": 60,
-    }
-}
+import dj_database_url
 
-# Add SSL for external database hosts (Supabase, etc.)
-# Skip SSL for localhost and Render internal hosts (dpg-*)
-_db_host = os.getenv("DB_HOST", "localhost")
-if _db_host != "localhost" and not _db_host.startswith("dpg-"):
-    DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
+_database_url = os.getenv("DATABASE_URL")
+if _database_url:
+    DATABASES = {
+        "default": dj_database_url.parse(_database_url, conn_max_age=60)
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "mediscan_db"),
+            "USER": os.getenv("DB_USER", "postgres"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+            "CONN_MAX_AGE": 60,
+        }
+    }
+    _db_host = os.getenv("DB_HOST", "localhost")
+    if _db_host != "localhost" and not _db_host.startswith("dpg-"):
+        DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 
 AUTH_USER_MODEL = "users.CustomUser"
 
