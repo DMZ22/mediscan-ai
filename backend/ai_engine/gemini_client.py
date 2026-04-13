@@ -1,45 +1,178 @@
 """
 Gemini AI Client — shared AI engine for MediScan AI platform.
-Uses Google Gemini API (free tier: 15 RPM, 1500 RPD).
+Supports multiple API keys with round-robin load balancing and automatic failover.
+
+Configuration via environment variables:
+  GEMINI_API_KEY=key1            (single key)
+  GEMINI_API_KEYS=key1,key2,key3 (multiple keys — comma separated)
+
+If both are set, all keys are pooled together.
+Requests are distributed across working keys via round-robin.
+Failed keys are temporarily disabled and retried after a cooldown period.
 """
 import os
 import json
+import time
 import logging
+import threading
 import google.generativeai as genai
 
 logger = logging.getLogger(__name__)
 
-_model = None
+
+# ── Multi-Key Pool ───────────────────────────────────────────────────
+
+class GeminiKeyPool:
+    """Thread-safe round-robin key pool with failover and cooldown."""
+
+    COOLDOWN_SECONDS = 60  # How long to wait before retrying a failed key
+
+    def __init__(self):
+        self._keys: list[str] = []
+        self._models: dict[str, genai.GenerativeModel] = {}
+        self._failed: dict[str, float] = {}  # key -> timestamp of failure
+        self._index = 0
+        self._lock = threading.Lock()
+        self._initialized = False
+
+    def _load_keys(self):
+        """Load API keys from environment variables."""
+        keys = set()
+
+        single = os.getenv("GEMINI_API_KEY", "").strip()
+        if single:
+            keys.add(single)
+
+        multi = os.getenv("GEMINI_API_KEYS", "").strip()
+        if multi:
+            for k in multi.split(","):
+                k = k.strip()
+                if k:
+                    keys.add(k)
+
+        if not keys:
+            raise ValueError(
+                "No Gemini API keys configured. "
+                "Set GEMINI_API_KEY or GEMINI_API_KEYS (comma-separated) in your .env"
+            )
+
+        self._keys = list(keys)
+        logger.info(f"Gemini key pool initialized with {len(self._keys)} key(s)")
+
+    def _get_model_for_key(self, api_key: str) -> genai.GenerativeModel:
+        """Get or create a model instance for a specific API key."""
+        if api_key not in self._models:
+            genai.configure(api_key=api_key)
+            self._models[api_key] = genai.GenerativeModel("gemini-2.0-flash")
+        return self._models[api_key]
+
+    def _is_key_available(self, key: str) -> bool:
+        """Check if a key is available (not in cooldown)."""
+        if key not in self._failed:
+            return True
+        elapsed = time.time() - self._failed[key]
+        if elapsed >= self.COOLDOWN_SECONDS:
+            del self._failed[key]
+            logger.info(f"Gemini key ...{key[-6:]} cooldown expired, re-enabling")
+            return True
+        return False
+
+    def _mark_failed(self, key: str):
+        """Mark a key as failed and start cooldown."""
+        self._failed[key] = time.time()
+        logger.warning(f"Gemini key ...{key[-6:]} marked as failed, cooldown {self.COOLDOWN_SECONDS}s")
+
+    def _mark_success(self, key: str):
+        """Clear any failure state for a key."""
+        self._failed.pop(key, None)
+
+    def get_available_keys(self) -> list[str]:
+        """Get list of keys in round-robin order, available ones first."""
+        with self._lock:
+            if not self._initialized:
+                self._load_keys()
+                self._initialized = True
+
+            # Start from current index for round-robin
+            n = len(self._keys)
+            ordered = [self._keys[(self._index + i) % n] for i in range(n)]
+            # Advance index for next call
+            self._index = (self._index + 1) % n
+
+        # Available keys first, then cooldown keys as last resort
+        available = [k for k in ordered if self._is_key_available(k)]
+        cooldown = [k for k in ordered if not self._is_key_available(k)]
+        return available + cooldown
+
+    def execute(self, fn, *args, **kwargs):
+        """Execute a function with automatic key rotation and failover.
+
+        fn receives (model, *args, **kwargs) and should return the result.
+        On failure, the next key is tried. All keys exhausted raises the last error.
+        """
+        keys = self.get_available_keys()
+        last_error = None
+
+        for key in keys:
+            try:
+                # Configure genai for this specific key
+                genai.configure(api_key=key)
+                model = self._get_model_for_key(key)
+                # Recreate model after configure to ensure it uses the right key
+                model = genai.GenerativeModel("gemini-2.0-flash")
+                self._models[key] = model
+
+                result = fn(model, *args, **kwargs)
+                self._mark_success(key)
+                return result
+
+            except Exception as e:
+                last_error = e
+                error_str = str(e).lower()
+
+                # Rate limit or quota errors → failover to next key
+                if any(term in error_str for term in ["quota", "rate", "limit", "429", "resource_exhausted"]):
+                    logger.warning(f"Key ...{key[-6:]} rate limited, trying next key")
+                    self._mark_failed(key)
+                    continue
+
+                # Auth errors → key is bad, skip it
+                if any(term in error_str for term in ["invalid", "api_key", "401", "403", "permission"]):
+                    logger.error(f"Key ...{key[-6:]} authentication failed, disabling")
+                    self._mark_failed(key)
+                    continue
+
+                # Other errors (network, server) → try next key
+                logger.warning(f"Key ...{key[-6:]} error: {e}, trying next key")
+                self._mark_failed(key)
+                continue
+
+        # All keys exhausted
+        logger.error(f"All {len(keys)} Gemini keys failed. Last error: {last_error}")
+        raise last_error
 
 
-def get_model():
-    global _model
-    if _model is None:
-        api_key = os.getenv("GEMINI_API_KEY", "")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY environment variable is not set")
-        genai.configure(api_key=api_key)
-        _model = genai.GenerativeModel("gemini-2.0-flash")
-    return _model
+# Global pool instance
+_pool = GeminiKeyPool()
 
+
+# ── Public API (same interface as before) ────────────────────────────
 
 def ask_gemini(prompt: str, system_instruction: str = "") -> str:
     """Send a prompt to Gemini and return text response."""
-    try:
-        model = get_model()
-        full_prompt = f"{system_instruction}\n\n{prompt}" if system_instruction else prompt
+    full_prompt = f"{system_instruction}\n\n{prompt}" if system_instruction else prompt
+
+    def _call(model):
         response = model.generate_content(full_prompt)
         return response.text
-    except Exception as e:
-        logger.error(f"Gemini API error: {e}")
-        raise
+
+    return _pool.execute(_call)
 
 
 def ask_gemini_json(prompt: str, system_instruction: str = "") -> dict:
     """Send a prompt to Gemini and parse JSON response."""
     try:
         raw = ask_gemini(prompt, system_instruction)
-        # Extract JSON from markdown code blocks if present
         text = raw.strip()
         if text.startswith("```"):
             lines = text.split("\n")
@@ -47,25 +180,20 @@ def ask_gemini_json(prompt: str, system_instruction: str = "") -> dict:
             text = "\n".join(lines)
         return json.loads(text)
     except json.JSONDecodeError:
-        logger.warning(f"Failed to parse Gemini JSON response, returning raw text")
+        logger.warning("Failed to parse Gemini JSON response, returning raw text")
         return {"raw_response": raw, "parse_error": True}
-    except Exception as e:
-        logger.error(f"Gemini JSON error: {e}")
-        raise
 
 
 def ask_gemini_vision(image_data: bytes, prompt: str, mime_type: str = "image/jpeg") -> str:
     """Send an image to Gemini Vision for analysis."""
-    try:
-        model = get_model()
+    def _call(model):
         response = model.generate_content([
             prompt,
             {"mime_type": mime_type, "data": image_data}
         ])
         return response.text
-    except Exception as e:
-        logger.error(f"Gemini Vision error: {e}")
-        raise
+
+    return _pool.execute(_call)
 
 
 # ── Disease Screening Prompts ────────────────────────────────────────
@@ -128,29 +256,12 @@ Respond with ONLY this JSON:
 
 def extract_lab_from_image(image_data: bytes, mime_type: str = "image/jpeg") -> dict:
     """Extract lab values from uploaded report image/PDF."""
-    prompt = """Extract ALL lab test values from this medical report image.
-
-Respond with ONLY this JSON:
-{
-    "panel_type": "<detected panel type: cbc|lipid_panel|metabolic|liver_function|kidney_function|thyroid|comprehensive>",
-    "values": {
-        "<test_name>": {"value": <number>, "unit": "<unit>", "reference_range": "<low-high>"}
-    },
-    "patient_info": {"name": "<if visible>", "date": "<if visible>"},
-    "extraction_confidence": "<high|medium|low>"
-}
-
-Extract every test value visible. Use standard medical abbreviations."""
-
-    return ask_gemini_json(
-        ask_gemini_vision(image_data, prompt, mime_type)
-    ) if False else _extract_lab_vision(image_data, mime_type)
+    return _extract_lab_vision(image_data, mime_type)
 
 
 def _extract_lab_vision(image_data: bytes, mime_type: str) -> dict:
     """Internal: use Gemini Vision to extract lab values."""
     try:
-        model = get_model()
         prompt = """Extract ALL lab test values from this medical report.
 
 Respond with ONLY valid JSON:
@@ -163,11 +274,8 @@ Respond with ONLY valid JSON:
     "extraction_confidence": "<high|medium|low>"
 }"""
 
-        response = model.generate_content([
-            prompt,
-            {"mime_type": mime_type, "data": image_data}
-        ])
-        text = response.text.strip()
+        raw = ask_gemini_vision(image_data, prompt, mime_type)
+        text = raw.strip()
         if text.startswith("```"):
             lines = text.split("\n")
             lines = [l for l in lines if not l.strip().startswith("```")]
@@ -282,7 +390,7 @@ def health_chat(message: str, history: list = None) -> str:
     chat_context = ""
     if history:
         chat_context = "\n\nConversation history:\n"
-        for msg in history[-10:]:  # Keep last 10 messages for context
+        for msg in history[-10:]:
             role = msg.get("role", "user")
             chat_context += f"{role}: {msg.get('content', '')}\n"
 
