@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: mediscan-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: singapore
+    plan: free
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ADMIN_SECRET_CODE
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: SENDER_EMAIL
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
