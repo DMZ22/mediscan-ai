@@ -50,6 +50,10 @@ desktop.ini
 backend/ml_engine/diabetes.csv
 backend/ml_engine/diabetes_012.csv
 
+# Binaries
+*.exe
+*.dll
+
 # Misc
 *.log
 *.pid
